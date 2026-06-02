@@ -75,16 +75,8 @@ export default function ScenariosPage() {
                   onClick={() => { setSelected(s); setShowNew(false); }} />
               ))}
               <button
-                onClick={() => { setSelected(null); setShowNew(true); }}
-                data-common="first"
                 className="w-full text-left text-xs text-blue-500 hover:text-blue-700 py-1 pl-1"
-                onClick={() => {
-                  setSelected(null);
-                  setShowNew(true);
-                  setTimeout(() => {
-                    (document.getElementById('new-common-first') as HTMLElement)?.click();
-                  }, 50);
-                }}
+                onClick={() => { setSelected(null); setShowNew(true); }}
               >＋ 追加</button>
             </div>
 
