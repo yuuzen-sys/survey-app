@@ -20,6 +20,12 @@ export default function LoginPage() {
       const envUsername = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'admin';
       const envPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'password123';
 
+      // デバッグ用
+      console.log('envUsername:', envUsername);
+      console.log('envPassword:', envPassword);
+      console.log('input username:', username);
+      console.log('input password:', password);
+
       if (username === envUsername && password === envPassword) {
         // ログイン成功 - sessionStorage にフラグを設定
         sessionStorage.setItem('adminLoggedIn', 'true');
