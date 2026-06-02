@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
 
     const { data: surveyData, error: surveyError } = await supabase
       .from('surveys')
-      .insert({ week: weekStart.toISOString().split('T')[0], created_by: userId })
+      .insert({ week: weekStart.toISOString().split('T')[0], created_by: null })
       .select()
       .single();
 
