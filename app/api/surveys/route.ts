@@ -32,21 +32,25 @@ export async function POST(req: NextRequest) {
 
     const supabase = getServiceRoleClient();
 
-    // ユーザーが存在しなければ作成
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id, email')
-      .eq('id', userId)
-      .single();
-
-    if (!existingUser) {
-      const { data: authUser } = await supabase.auth.admin.getUserById(userId);
-      const email = authUser?.user?.email || 'user@example.com';
-      const { error: userError } = await supabase
+    // 固定ログイン時（userId が UUID でない場合）は user 作成をスキップ
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (uuidRegex.test(userId)) {
+      // ユーザーが存在しなければ作成
+      const { data: existingUser } = await supabase
         .from('users')
-        .insert({ id: userId, email, name: 'ユーザー' });
-      if (userError) {
-        return NextResponse.json({ error: userError.message }, { status: 500 });
+        .select('id, email')
+        .eq('id', userId)
+        .single();
+
+      if (!existingUser) {
+        const { data: authUser } = await supabase.auth.admin.getUserById(userId);
+        const email = authUser?.user?.email || 'user@example.com';
+        const { error: userError } = await supabase
+          .from('users')
+          .insert({ id: userId, email, name: 'ユーザー' });
+        if (userError) {
+          return NextResponse.json({ error: userError.message }, { status: 500 });
+        }
       }
     }
 
