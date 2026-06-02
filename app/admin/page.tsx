@@ -28,12 +28,16 @@ export default function AdminPage() {
 
   async function checkAuth() {
     try {
-      const currentUser = await getCurrentUser();
-      if (!currentUser) {
-        router.push('/admin/login');
-        return;
+      // sessionStorage でログイン状態をチェック
+      if (typeof window !== 'undefined') {
+        const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
+        if (!isLoggedIn) {
+          router.push('/admin/login');
+          return;
+        }
       }
-      setUser(currentUser);
+      // ダミーユーザーをセット
+      setUser({ id: 'admin', name: '管理者' });
       loadSurveys();
     } catch {
       router.push('/admin/login');
@@ -127,7 +131,10 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">覆面調査管理システム</h1>
           <button
-            onClick={async () => { await supabase.auth.signOut(); router.push('/admin/login'); }}
+            onClick={() => {
+              sessionStorage.removeItem('adminLoggedIn');
+              router.push('/admin/login');
+            }}
             className="text-gray-600 hover:text-gray-900"
           >
             ログアウト

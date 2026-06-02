@@ -2,11 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInUser } from '@/lib/auth';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -17,8 +16,17 @@ export default function LoginPage() {
     setError('');
 
     try {
-      await signInUser(email, password);
-      router.push('/admin');
+      // 環境変数と比較
+      const envUsername = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'admin';
+      const envPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'password123';
+
+      if (username === envUsername && password === envPassword) {
+        // ログイン成功 - sessionStorage にフラグを設定
+        sessionStorage.setItem('adminLoggedIn', 'true');
+        router.push('/admin');
+      } else {
+        throw new Error('ユーザー名またはパスワードが正しくありません');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'ログインに失敗しました');
     } finally {
@@ -45,17 +53,17 @@ export default function LoginPage() {
           )}
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email" className="sr-only">
-                メールアドレス
+              <label htmlFor="username" className="sr-only">
+                ユーザー名
               </label>
               <input
-                id="email"
-                type="email"
+                id="username"
+                type="text"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="メールアドレス"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ユーザー名"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div>
