@@ -42,7 +42,7 @@ export default function SurveyDashboard() {
       setMembers(
         (membersData || []).map(m => ({
           ...m,
-          url: `/survey/${m.token}`,
+          url: `${typeof window !== 'undefined' ? window.location.origin : ''}/survey/${m.token}`,
         }))
       );
 
