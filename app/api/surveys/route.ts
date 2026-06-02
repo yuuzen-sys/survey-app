@@ -155,9 +155,10 @@ export async function POST(req: NextRequest) {
     // シナリオは管理画面で手動管理するため、インポート時には自動作成しない
     // scenario_key（例: ①③④）は shops テーブルに保存済み
 
-    // フルパス URL を生成（req.url から動的に取得）
-    const url = new URL(req.url);
-    const origin = url.origin;
+    // フルパス URL を生成（Render 環境では RENDER_EXTERNAL_URL を優先）
+    const origin = process.env.RENDER_EXTERNAL_URL
+      || req.headers.get('x-forwarded-proto') + '://' + req.headers.get('x-forwarded-host')
+      || new URL(req.url).origin;
 
     return NextResponse.json({
       surveyId,
