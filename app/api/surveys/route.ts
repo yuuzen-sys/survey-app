@@ -3,11 +3,11 @@ import { getServiceRoleClient } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
- * シナリオ列からキャリアを抽出する
- * 例: 【au①③】現SB... → au / [SB①③]現au... → SB
+ * シナリオ列からキャリアを抽出する（最初の英字のみ）
+ * 例: [D①] → D / [DS①] → D / [SB③] → S / [au①③] → a
  */
 function extractCarrierFromScenario(scenario: string): string {
-  const match = scenario.match(/[【\[]([a-zA-Z]+)[①②③④]/);
+  const match = scenario.match(/[【\[]([a-zA-Z])[a-zA-Z]*[①②③④]/);
   if (match) return match[1];
   return '';
 }
