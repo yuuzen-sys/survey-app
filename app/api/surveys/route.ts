@@ -14,11 +14,12 @@ function extractCarrierFromScenario(scenario: string): string {
 
 /**
  * シナリオ列からシナリオキー（番号の組み合わせ）を抽出する
- * 例: 【au①③】→ ①③ / 【au②③④】→ ②③④
+ * 例: 【au①③】→ ①③ / [D③]... → ③ / 【au②③④】→ ②③④
  */
 function extractScenarioKey(scenario: string): string {
-  const match = scenario.match(/【[a-zA-Z]*([①②③④]+)】/);
-  return match ? match[1] : '';
+  // 【...】形式と[...]形式の両方に対応
+  const match = scenario.match(/[【\[]([a-zA-Z]*)([①②③④]+)[】\]]/);
+  return match ? match[2] : '';
 }
 
 // POST /api/surveys - Excel data import and process
@@ -126,8 +127,8 @@ export async function POST(req: NextRequest) {
     // キャリア別カラー
     const carrierColors: Record<string, string> = {
       au:     '#FF9500', // オレンジ
-      SB:     '#9E9E9E', // グレー
-      sb:     '#9E9E9E',
+      SB:     '#2563EB', // ブルー
+      sb:     '#2563EB', // ブルー
       docomo: '#E60012', // 赤
       D:      '#E60012', // 赤
       DS:     '#E60012', // 赤
