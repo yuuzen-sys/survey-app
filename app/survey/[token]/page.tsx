@@ -244,7 +244,7 @@ export default function SurveyPage() {
                     onChange={(e) => setTransportNotes(e.target.value)}
                     className="w-full px-3 py-2 border rounded-lg text-sm"
                     rows={3}
-                    placeholder="例）電車：500円、バス：220円"
+                    placeholder="例）初台～つつじが丘　209円&#10;つつじが丘駅北口～神代植物公園　230円"
                   />
                 </div>
                 <div className="flex gap-2">
