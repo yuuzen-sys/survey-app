@@ -319,6 +319,12 @@ function ShopDetail({
   }, [shopId]);
 
   async function loadShopData() {
+    // 新しい店舗を読み込む時に state を初期化（前の店舗のデータが残るのを防ぐ）
+    setIsLoading(true);
+    setScenarios([]);
+    setCommonFirstScenarios([]);
+    setCommonLastScenarios([]);
+
     try {
       const { data: shopData, error: shopError } = await supabase
         .from('shops')
@@ -329,9 +335,9 @@ function ShopDetail({
       if (shopError) throw shopError;
       setShop(shopData);
 
-      // キャリアを抽出
-      const carrierMatch = shopData.code.match(/[【\[]出?([a-zA-Z]+)\d*[】\]]/);
-      const carrier = carrierMatch ? carrierMatch[1] : null;
+      // shopData.carrier を優先的に使用、なければ code から抽出
+      const carrier = shopData.carrier ||
+        (shopData.code.match(/[【\[]出?([a-zA-Z]+)\d*[】\]]/)?.[1] ?? null);
 
       if (carrier) {
         // scenario_key から個々の番号を分解（例: ①③ → ['①','③']）
@@ -369,6 +375,8 @@ function ShopDetail({
       setCommonFirstScenarios(firstData || []);
       setCommonLastScenarios(lastData || []);
 
+    } catch (error) {
+      console.error('Error loading shop data:', error);
     } finally {
       setIsLoading(false);
     }
