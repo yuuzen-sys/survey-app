@@ -129,7 +129,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">覆面調査管理システム</h1>
+          <h1 className="text-2xl font-bold">Compass　ー覆面調査管理システムー</h1>
           <button
             onClick={() => {
               sessionStorage.removeItem('adminLoggedIn');
