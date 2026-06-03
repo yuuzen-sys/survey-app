@@ -38,20 +38,13 @@ export default function ReportPage() {
         .single();
       setShop(shopData);
 
-      // Get checklist items and choices (from master scenario by carrier × scenario_number)
-      const { data: shopsData } = await supabase
-        .from('shops')
-        .select('code, scenario_key, carrier')
-        .eq('id', shopId)
-        .single();
+      if (!shopData) throw new Error('Shop not found');
 
-      if (!shopsData) throw new Error('Shop not found');
-
-      // Get carrier from shop data (set by API during import)
-      const carrier = (shopsData as any).carrier || '';
+      // Get carrier and scenario_key from shop data
+      const carrier = (shopData as any).carrier || '';
 
       // scenario_key から個々の番号を分解（例: ①③ → ['①','③']）
-      const scenarioKey: string = (shopsData as any).scenario_key || '';
+      const scenarioKey: string = (shopData as any).scenario_key || '';
       const numbers = scenarioKey.match(/[①②③④]/g) || [];
 
       const numberOrder = ['①', '②', '③', '④'];
