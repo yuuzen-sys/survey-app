@@ -246,8 +246,9 @@ export default function SurveyPage() {
                     rows={3}
                     placeholder="詳細を入力してください"
                   />
-                  <p className="text-xs text-gray-500 mt-2 whitespace-pre-wrap">例）初台～つつじが丘　209円
-つつじが丘駅北口～神代植物公園　230円</p>
+                  <p className="text-xs text-gray-500 mt-2" style={{ whiteSpace: 'pre-wrap' }}>
+                    例）初台～つつじが丘　209円{'\n'}つつじが丘駅北口～神代植物公園　230円
+                  </p>
                 </div>
                 <div className="flex gap-2">
                   <button
