@@ -3,11 +3,11 @@ import { getServiceRoleClient } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
- * シナリオ列からキャリアを抽出する（最初の英字のみ）
- * 例: [D①] → D / [DS①] → D / [SB③] → S / [au①③] → a
+ * シナリオ列からキャリアを抽出する
+ * 例: [D①] → D / [DS①] → DS / [SB③] → SB / [au①③] → au
  */
 function extractCarrierFromScenario(scenario: string): string {
-  const match = scenario.match(/[【\[]([a-zA-Z])[a-zA-Z]*[①②③④]/);
+  const match = scenario.match(/[【\[]([a-zA-Z]+)[①②③④]/);
   if (match) return match[1];
   return '';
 }
@@ -129,7 +129,8 @@ export async function POST(req: NextRequest) {
       SB:     '#9E9E9E', // グレー
       sb:     '#9E9E9E',
       docomo: '#E60012', // 赤
-      D:      '#E60012',
+      D:      '#E60012', // 赤
+      DS:     '#E60012', // 赤
     };
     function getCarrierColor(carrier: string): string {
       return carrierColors[carrier] || '#78909C';
