@@ -41,7 +41,7 @@ export default function ReportPage() {
       // Get checklist items and choices (from master scenario by carrier × scenario_number)
       const { data: shopsData } = await supabase
         .from('shops')
-        .select('code, scenario_key')
+        .select('code, scenario_key, carrier')
         .eq('id', shopId)
         .single();
 
