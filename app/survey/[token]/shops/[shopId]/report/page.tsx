@@ -47,9 +47,8 @@ export default function ReportPage() {
 
       if (!shopsData) throw new Error('Shop not found');
 
-      // Extract carrier from shop code (e.g. 【出au01】→ au / [au04] → au)
-      const carrierMatch = shopsData.code.match(/[【\[]出?([a-zA-Z]+)\d*[】\]]/);
-      const carrier = carrierMatch ? carrierMatch[1] : shopsData.code.replace(/[0-9【】\[\]出]/g, '').trim();
+      // Get carrier from shop data (set by API during import)
+      const carrier = (shopsData as any).carrier || '';
 
       // scenario_key から個々の番号を分解（例: ①③ → ['①','③']）
       const scenarioKey: string = (shopsData as any).scenario_key || '';

@@ -137,12 +137,13 @@ export async function POST(req: NextRequest) {
       return carrierColors[carrier] || '#78909C';
     }
 
-    // 店舗を作成（scenario_key・color も保存）
+    // 店舗を作成（carrier・scenario_key・color も保存）
     const shopInserts = shopRows.map(shop => ({
       survey_id: surveyId,
       code: shop.code,
       name: shop.name,
       assigned_member_id: memberIdMap.get(shop.memberName),
+      carrier: shop.carrier || null,
       scenario_key: shop.scenarioNumber || null,
       color: getCarrierColor(shop.carrier),
     }));
