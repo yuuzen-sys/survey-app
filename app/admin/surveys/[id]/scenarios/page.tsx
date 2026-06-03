@@ -492,7 +492,7 @@ function ScenarioEditor({
                   onChange={(e) => setDupForm({ ...dupForm, scenario_number: e.target.value })}
                   className="w-full px-3 py-2 border rounded"
                 >
-                  {['①', '②', '③', '④', '①②', '①③', '①④', '②③', '②④', '③④', '①②③', '②③④', '①②③④'].map(n => (
+                  {['⓪', '①', '②', '③', '④', '①②', '①③', '①④', '②③', '②④', '③④', '①②③', '②③④', '①②③④'].map(n => (
                     <option key={n} value={n}>{n}</option>
                   ))}
                 </select>
