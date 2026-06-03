@@ -244,8 +244,10 @@ export default function SurveyPage() {
                     onChange={(e) => setTransportNotes(e.target.value)}
                     className="w-full px-3 py-2 border rounded-lg text-sm"
                     rows={3}
-                    placeholder="例）初台～つつじが丘　209円&#10;つつじが丘駅北口～神代植物公園　230円"
+                    placeholder="詳細を入力してください"
                   />
+                  <p className="text-xs text-gray-500 mt-2 whitespace-pre-wrap">例）初台～つつじが丘　209円
+つつじが丘駅北口～神代植物公園　230円</p>
                 </div>
                 <div className="flex gap-2">
                   <button

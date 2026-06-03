@@ -187,7 +187,12 @@ function TransportCell({ surveyId, memberId, memberName }: {
 
   return (
     <div className="mt-3 pt-3 border-t text-sm text-gray-600">
-      交通費：{transport ? `¥${Number(transport.amount).toLocaleString()} ${transport.notes || ''}` : '未提出'}
+      <div>交通費：¥{transport ? Number(transport.amount).toLocaleString() : '未提出'}</div>
+      {transport?.notes && (
+        <div className="mt-1 text-xs text-gray-500 whitespace-pre-wrap bg-gray-50 p-2 rounded">
+          {transport.notes}
+        </div>
+      )}
     </div>
   );
 }
