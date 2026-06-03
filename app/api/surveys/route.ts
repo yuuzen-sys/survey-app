@@ -150,7 +150,7 @@ export async function POST(req: NextRequest) {
     const { data: shopsData, error: shopsError } = await supabase
       .from('shops')
       .insert(shopInserts)
-      .select();
+      .select('id, code, name, carrier, scenario_key, color, assigned_member_id');
     if (shopsError) {
       return NextResponse.json({ error: shopsError.message }, { status: 500 });
     }
