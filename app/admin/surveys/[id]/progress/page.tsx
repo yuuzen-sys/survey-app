@@ -210,12 +210,12 @@ function ReportModal({ report, shop, member, onClose, onChecked }: {
   }, [report.id]);
 
   async function loadItems() {
-    // キャリア抽出
-    const carrierMatch = shop.code.match(/[【\[]出?([a-zA-Z]+)\d*[】\]]/);
-    const carrier = carrierMatch ? carrierMatch[1] : '';
+    // DBに保存済みの carrier を使用（shop.code からの抽出は不要）
+    const carrier = shop.carrier || '';
     const scenarioKey: string = shop.scenario_key || '';
-    const numbers = scenarioKey.match(/[①②③④]/g) || [];
-    const numberOrder = ['①', '②', '③', '④'];
+    // ⓪も含めて丸数字を抽出
+    const numbers = scenarioKey.match(/[①②③④⓪]/g) || [];
+    const numberOrder = ['⓪', '①', '②', '③', '④'];
 
     const allItems: any[] = [];
 
