@@ -198,7 +198,7 @@ export default function SurveyPage() {
               >
                 <div>
                   <p className="font-bold">{shop.name}</p>
-                  <p className="text-sm opacity-75">[{shop.code}]</p>
+                  <p className="text-sm opacity-75">{shop.code}</p>
                 </div>
                 {shop.completed && (
                   <span className="text-sm font-bold bg-green-700 text-white px-2 py-1 rounded">
@@ -400,7 +400,7 @@ function ShopDetail({
           style={{ backgroundColor: shop.color }}
         >
           <h2 className="text-2xl font-bold">{shop.name}</h2>
-          <p className="text-sm opacity-90 mt-1">[{shop.code}]</p>
+          <p className="text-sm opacity-90 mt-1">{shop.code}</p>
         </div>
 
         {/* 共通（最初）シナリオ */}
