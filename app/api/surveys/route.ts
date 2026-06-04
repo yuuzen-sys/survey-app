@@ -8,10 +8,12 @@ import { v4 as uuidv4 } from 'uuid';
  * 例: 【D②③】「説明文...」→ D / 【SB①】現au → SB / 【au②③】→ au
  */
 function extractCarrierFromScenario(scenario: string): string {
-  // 【】内の最初の英字を抽出、【】外は無視
-  const match = scenario.match(/【([a-zA-Z]+)[①②③④⓪]/);
-  if (match) return match[1];
-  return '';
+  // 【】内の内容を取得してから英字を抽出（⓪のUnicode不一致を回避）
+  const bracketMatch = scenario.match(/【([^】]*)】/);
+  if (!bracketMatch) return '';
+  const inside = bracketMatch[1]; // 例: "D⓪" / "au①③" / "SB②③"
+  const letterMatch = inside.match(/([a-zA-Z]+)/);
+  return letterMatch ? letterMatch[1] : '';
 }
 
 /**
