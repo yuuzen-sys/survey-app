@@ -184,6 +184,15 @@ export default function ReportPage() {
   }
 
   async function handleSubmit() {
+    // ===== デバッグ用ログ =====
+    console.log('====== SUBMIT DEBUG ======');
+    console.log('Items count:', items.length);
+    console.log('Items:', items.map(i => ({ id: i.id, name: i.item_name })));
+    console.log('Responses object keys:', Object.keys(responses));
+    console.log('Responses content:', JSON.stringify(responses, null, 2));
+    console.log('========================');
+    // ====================
+
     // Validate all items have at least one selection or free text
     const allSelected = items.every(item => {
       const itemResponses = responses[item.id];
