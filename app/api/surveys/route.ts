@@ -4,12 +4,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 /**
  * シナリオ列からキャリアを抽出する
- * 例: [D①] → D / [DS①] → DS / [SB③] → SB / [au①③] → au / D⓪ → D
- * 括弧の有無、⓪にも対応
+ * 例: [D①] → D / [DS①] → DS / [SB③] → SB / [au①③] → au / D⓪ → D / Ⅾ⓪ → D
+ * シナリオ列の最初の英字を常にキャリアとして抽出
  */
 function extractCarrierFromScenario(scenario: string): string {
-  // 括弧形式と括弧なし形式に対応、⓪も含める
-  const match = scenario.match(/([a-zA-Z]+)[①②③④⓪]/);
+  // シナリオ列から最初の英字（1～3文字）を抽出
+  // 【D②③】、D②③、D⓪、Ⅾ⓪ など全形式に対応
+  const match = scenario.match(/([a-zA-Z]+)/);
   if (match) return match[1];
   return '';
 }
