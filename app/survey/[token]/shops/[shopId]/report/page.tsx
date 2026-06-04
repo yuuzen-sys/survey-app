@@ -22,7 +22,6 @@ export default function ReportPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [shop, setShop] = useState<any>(null);
-  const [hasScenario, setHasScenario] = useState(true);
 
   useEffect(() => {
     loadChecklistData();
@@ -40,20 +39,14 @@ export default function ReportPage() {
 
       if (!shopData) throw new Error('Shop not found');
 
-      // Get carrier and scenario_key from shop data
       const carrier = (shopData as any).carrier || '';
-
-      // scenario_key から個々の番号を分解（例: ①③ → ['①','③']）
       const scenarioKey: string = (shopData as any).scenario_key || '';
-      const numbers = scenarioKey.match(/[①②③④]/g) || [];
+      // ⓪も含めて丸数字を抽出
+      const numbers = scenarioKey.match(/[①②③④⓪]/g) || [];
+      const numberOrder = ['⓪', '①', '②', '③', '④'];
 
-      const numberOrder = ['①', '②', '③', '④'];
-      const shopHasScenario = numbers.length > 0;
-      setHasScenario(shopHasScenario);
-
-      // scenario_key がない場合はチェック項目なし（共通質問のみ表示）
       let sortedScenarios: any[] = [];
-      if (numbers.length > 0) {
+      if (numbers.length > 0 && carrier) {
         const { data: scenariosData } = await supabase
           .from('scenarios')
           .select('id, scenario_number')
@@ -63,7 +56,6 @@ export default function ReportPage() {
           (a, b) => numberOrder.indexOf(a.scenario_number) - numberOrder.indexOf(b.scenario_number)
         );
       }
-      // （scenario_keyがない場合は空のまま = シナリオ固有質問なし）
 
       // 共通（最初）のチェック項目を取得
       const { data: firstCommonScenarios } = await supabase
@@ -99,7 +91,7 @@ export default function ReportPage() {
         allItems.push(...await fetchItems(s.id));
       }
 
-      // シナリオごとにチェック項目を順番に取得して結合
+      // キャリア別シナリオ
       for (const scenario of sortedScenarios) {
         const { data: itemsData } = await supabase
           .from('checklist_items')
@@ -143,7 +135,6 @@ export default function ReportPage() {
 
       setItems(formattedItems);
 
-      // Initialize responses
       const initialResponses: Record<string, { choices: string[]; freeText: string }> = {};
       formattedItems.forEach(item => {
         initialResponses[item.id] = { choices: [], freeText: '' };
@@ -184,14 +175,11 @@ export default function ReportPage() {
   }
 
   async function handleSubmit() {
-    // Validate all items have at least one selection or free text
     const allSelected = items.every(item => {
       const itemResponses = responses[item.id];
       if (item.item_type === 'free_text_only') {
         return itemResponses && itemResponses.freeText.trim().length > 0;
       }
-      // item_type === 'choice'
-      // チェックボックスを選んでいるか、またはその他（自由記述）を入力しているか
       const hasChoice = itemResponses && itemResponses.choices.length > 0;
       const hasText = itemResponses && itemResponses.freeText.trim().length > 0;
       return hasChoice || (item.has_free_text && hasText);
@@ -204,7 +192,6 @@ export default function ReportPage() {
 
     setIsSaving(true);
     try {
-      // Get member by token
       const { data: memberData } = await supabase
         .from('survey_members')
         .select('id, survey_id')
@@ -215,7 +202,6 @@ export default function ReportPage() {
         throw new Error('調査員情報が見つかりません');
       }
 
-      // Create report
       const { error } = await supabase
         .from('survey_reports')
         .insert({
@@ -258,110 +244,61 @@ export default function ReportPage() {
           <h2 className="text-2xl font-bold">{shop?.name}</h2>
         </div>
 
-        {/* シナリオなし店舗の場合のメッセージ */}
-        {!hasScenario && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-            <p className="text-sm text-yellow-800 font-medium">シナリオなし店舗</p>
-            <p className="text-xs text-yellow-700 mt-1">共通チェック項目のみ回答してください</p>
-          </div>
-        )}
-
         <div className="bg-white rounded-lg shadow p-6 space-y-6">
-          {items.length === 0 ? (
-            <div className="text-center py-4">
-              <p className="text-gray-500">チェック項目がありません</p>
-              <button
-                onClick={async () => {
-                  setIsSaving(true);
-                  try {
-                    const { data: memberData } = await supabase
-                      .from('survey_members')
-                      .select('id, survey_id')
-                      .eq('token', token)
-                      .single();
-                    if (!memberData) throw new Error('調査員情報が見つかりません');
-                    await supabase.from('survey_reports').insert({
-                      survey_id: memberData.survey_id,
-                      member_id: memberData.id,
-                      shop_id: shopId,
-                      responses: {},
-                      status: 'submitted',
-                    });
-                    alert('報告が完了しました');
-                    router.push(`/survey/${token}`);
-                  } catch (e) {
-                    alert('報告に失敗しました');
-                  } finally {
-                    setIsSaving(false);
-                  }
-                }}
-                disabled={isSaving}
-                className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg disabled:opacity-50"
-              >
-                {isSaving ? '送信中...' : '調査完了'}
-              </button>
-            </div>
-          ) : (
-            <>
-              {items.map((item) => (
-                <div key={item.id} className="border-b last:border-b-0 pb-4 last:pb-0">
-                  <p className="font-semibold text-gray-900 mb-3">{item.item_name}</p>
+          {items.map((item) => (
+            <div key={item.id} className="border-b last:border-b-0 pb-4 last:pb-0">
+              <p className="font-semibold text-gray-900 mb-3">{item.item_name}</p>
 
-                  {item.item_type === 'free_text_only' ? (
-                    /* 自由記述のみ */
-                    <textarea
-                      value={responses[item.id]?.freeText || ''}
-                      onChange={(e) => handleFreeTextChange(item.id, e.target.value)}
-                      placeholder="内容を入力してください"
-                      className="w-full px-3 py-2 border rounded text-sm"
-                      rows={3}
-                    />
-                  ) : (
-                    <>
-                      {/* 選択肢 */}
-                      <div className="space-y-2 mb-3">
-                        {item.choices.map((choice) => (
-                          <label key={choice.id} className="flex items-center">
-                            <input
-                              type="checkbox"
-                              checked={responses[item.id]?.choices.includes(choice.id) || false}
-                              onChange={(e) =>
-                                handleChoiceSelect(item.id, choice.id, e.target.checked)
-                              }
-                              className="h-4 w-4 text-blue-600"
-                            />
-                            <span className="ml-3 text-gray-700">{choice.choice_text}</span>
-                          </label>
-                        ))}
-                      </div>
+              {item.item_type === 'free_text_only' ? (
+                <textarea
+                  value={responses[item.id]?.freeText || ''}
+                  onChange={(e) => handleFreeTextChange(item.id, e.target.value)}
+                  placeholder="内容を入力してください"
+                  className="w-full px-3 py-2 border rounded text-sm"
+                  rows={3}
+                />
+              ) : (
+                <>
+                  <div className="space-y-2 mb-3">
+                    {item.choices.map((choice) => (
+                      <label key={choice.id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={responses[item.id]?.choices.includes(choice.id) || false}
+                          onChange={(e) =>
+                            handleChoiceSelect(item.id, choice.id, e.target.checked)
+                          }
+                          className="h-4 w-4 text-blue-600"
+                        />
+                        <span className="ml-3 text-gray-700">{choice.choice_text}</span>
+                      </label>
+                    ))}
+                  </div>
 
-                      {/* その他（自由記述） */}
-                      {item.has_free_text && (
-                        <div className="mt-3 p-3 bg-gray-50 rounded">
-                          <p className="text-sm text-gray-700 mb-2">その他（自由記述）</p>
-                          <textarea
-                            value={responses[item.id]?.freeText || ''}
-                            onChange={(e) => handleFreeTextChange(item.id, e.target.value)}
-                            placeholder="内容を入力してください"
-                            className="w-full px-3 py-2 border rounded text-sm"
-                            rows={2}
-                          />
-                        </div>
-                      )}
-                    </>
+                  {item.has_free_text && (
+                    <div className="mt-3 p-3 bg-gray-50 rounded">
+                      <p className="text-sm text-gray-700 mb-2">その他（自由記述）</p>
+                      <textarea
+                        value={responses[item.id]?.freeText || ''}
+                        onChange={(e) => handleFreeTextChange(item.id, e.target.value)}
+                        placeholder="内容を入力してください"
+                        className="w-full px-3 py-2 border rounded text-sm"
+                        rows={2}
+                      />
+                    </div>
                   )}
-                </div>
-              ))}
+                </>
+              )}
+            </div>
+          ))}
 
-              <button
-                onClick={handleSubmit}
-                disabled={isSaving}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg disabled:opacity-50 mt-6"
-              >
-                {isSaving ? '送信中...' : '完了'}
-              </button>
-            </>
-          )}
+          <button
+            onClick={handleSubmit}
+            disabled={isSaving}
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg disabled:opacity-50 mt-6"
+          >
+            {isSaving ? '送信中...' : '完了'}
+          </button>
         </div>
       </div>
     </div>

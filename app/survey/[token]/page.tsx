@@ -335,21 +335,16 @@ function ShopDetail({
       if (shopError) throw shopError;
       setShop(shopData);
 
-      // shopData.carrier を優先的に使用、なければ code から抽出
-      const carrier = shopData.carrier ||
-        (shopData.code.match(/[【\[]出?([a-zA-Z]+)\d*[】\]]/)?.[1] ?? null);
+      // DBに保存済みの carrier を使用
+      const carrier = shopData.carrier || null;
 
       if (carrier) {
-        // scenario_key から個々の番号を分解（例: ①③ → ['①','③']）
+        // scenario_key から個々の番号を分解（⓪含む）
         const scenarioKey: string = shopData.scenario_key || '';
-        const numbers = scenarioKey.match(/[①②③④]/g) || [];
+        const numbers = scenarioKey.match(/[①②③④⓪]/g) || [];
+        const numberOrder = ['⓪', '①', '②', '③', '④'];
 
-        const numberOrder = ['①', '②', '③', '④'];
-
-        // scenario_key がない場合はシナリオなし
-        if (numbers.length === 0) {
-          setScenarios([]);
-        } else {
+        if (numbers.length > 0) {
           const { data: scenariosData } = await supabase
             .from('scenarios')
             .select('*')
@@ -414,13 +409,9 @@ function ShopDetail({
         ))}
 
         {/* キャリア別シナリオ */}
-        {scenarios.length > 0 ? scenarios.map((scenario) => (
+        {scenarios.map((scenario) => (
           <ScenarioCard key={scenario.id} scenario={scenario} label={`シナリオ${scenario.scenario_number}`} />
-        )) : (
-          <div className="bg-white rounded-lg shadow p-6 mb-4">
-            <p className="text-gray-400 text-sm">シナリオが設定されていません</p>
-          </div>
-        )}
+        ))}
 
         {/* 共通（最後）シナリオ */}
         {commonLastScenarios.map((scenario) => (
