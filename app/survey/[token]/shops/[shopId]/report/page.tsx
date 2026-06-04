@@ -184,22 +184,17 @@ export default function ReportPage() {
   }
 
   async function handleSubmit() {
-    // ===== デバッグ用ログ =====
-    console.log('====== SUBMIT DEBUG ======');
-    console.log('Items count:', items.length);
-    console.log('Items:', items.map(i => ({ id: i.id, name: i.item_name })));
-    console.log('Responses object keys:', Object.keys(responses));
-    console.log('Responses content:', JSON.stringify(responses, null, 2));
-    console.log('========================');
-    // ====================
-
     // Validate all items have at least one selection or free text
     const allSelected = items.every(item => {
       const itemResponses = responses[item.id];
       if (item.item_type === 'free_text_only') {
         return itemResponses && itemResponses.freeText.trim().length > 0;
       }
-      return itemResponses && itemResponses.choices.length > 0;
+      // item_type === 'choice'
+      // チェックボックスを選んでいるか、またはその他（自由記述）を入力しているか
+      const hasChoice = itemResponses && itemResponses.choices.length > 0;
+      const hasText = itemResponses && itemResponses.freeText.trim().length > 0;
+      return hasChoice || (item.has_free_text && hasText);
     });
 
     if (!allSelected) {
