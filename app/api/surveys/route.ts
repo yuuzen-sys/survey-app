@@ -4,26 +4,28 @@ import { v4 as uuidv4 } from 'uuid';
 
 /**
  * シナリオ列からキャリアを抽出する
- * 例: [D①] → D / [DS①] → DS / [SB③] → SB / [au①③] → au / D⓪ → D / Ⅾ⓪ → D
- * シナリオ列の最初の英字を常にキャリアとして抽出
+ * 【】内の英字のみを対象とする
+ * 例: 【D②③】「説明文...」→ D / 【SB①】現au → SB / 【au②③】→ au
  */
 function extractCarrierFromScenario(scenario: string): string {
-  // シナリオ列から最初の英字（1～3文字）を抽出
-  // 半角・全角両方の英字に対応：【D②③】、D②③、D⓪、Ｄ⓪ など全形式に対応
-  const match = scenario.match(/([a-zA-Ａ-Ｚａ-ｚ]+)/);
+  // 【】内の最初の英字を抽出、【】外は無視
+  const match = scenario.match(/【([a-zA-Z]+)[①②③④⓪]/);
   if (match) return match[1];
   return '';
 }
 
 /**
  * シナリオ列からシナリオキー（番号の組み合わせ）を抽出する
- * 例: 【au①③】→ ①③ / [D③]... → ③ / 【au②③④】→ ②③④ / D⓪ → ⓪
- * 括弧の有無、⓪にも対応
+ * 【】内の丸数字のみを対象とする
+ * 例: 【D②③】「説明文...」→ ②③ / 【au⓪】→ ⓪ / 【SB①③】→ ①③
  */
 function extractScenarioKey(scenario: string): string {
-  // 丸数字（①②③④⓪）をすべて抽出
-  const matches = scenario.match(/[①②③④⓪]/g);
-  return matches ? matches.join('') : '';
+  // 【】内の丸数字のみを抽出、【】外は無視
+  const bracketMatch = scenario.match(/【[^】]*】/);
+  if (!bracketMatch) return '';
+  const inside = bracketMatch[0];
+  const numbers = inside.match(/[①②③④⓪]/g);
+  return numbers ? numbers.join('') : '';
 }
 
 // POST /api/surveys - Excel data import and process
