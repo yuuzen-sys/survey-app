@@ -89,6 +89,11 @@ export async function POST(req: NextRequest) {
       const carrier = scenario ? extractCarrierFromScenario(scenario) : '';
       const scenarioKey = scenario ? extractScenarioKey(scenario) : '';
 
+      // DEBUG
+      if (shopCode.includes('量販')) {
+        console.log(`[DEBUG ${shopCode}] scenario="${scenario}" → carrier="${carrier}", scenarioKey="${scenarioKey}"`);
+      }
+
       shopRows.push({ code: shopCode, name: shopName, memberName, scenario: scenario || '', carrier, scenarioNumber: scenarioKey });
     }
 
