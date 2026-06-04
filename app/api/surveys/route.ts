@@ -4,22 +4,25 @@ import { v4 as uuidv4 } from 'uuid';
 
 /**
  * シナリオ列からキャリアを抽出する
- * 例: [D①] → D / [DS①] → DS / [SB③] → SB / [au①③] → au
+ * 例: [D①] → D / [DS①] → DS / [SB③] → SB / [au①③] → au / D⓪ → D
+ * 括弧の有無、⓪にも対応
  */
 function extractCarrierFromScenario(scenario: string): string {
-  const match = scenario.match(/[【\[]([a-zA-Z]+)[①②③④]/);
+  // 括弧形式と括弧なし形式に対応、⓪も含める
+  const match = scenario.match(/([a-zA-Z]+)[①②③④⓪]/);
   if (match) return match[1];
   return '';
 }
 
 /**
  * シナリオ列からシナリオキー（番号の組み合わせ）を抽出する
- * 例: 【au①③】→ ①③ / [D③]... → ③ / 【au②③④】→ ②③④
+ * 例: 【au①③】→ ①③ / [D③]... → ③ / 【au②③④】→ ②③④ / D⓪ → ⓪
+ * 括弧の有無、⓪にも対応
  */
 function extractScenarioKey(scenario: string): string {
-  // 【...】形式と[...]形式の両方に対応
-  const match = scenario.match(/[【\[]([a-zA-Z]*)([①②③④]+)[】\]]/);
-  return match ? match[2] : '';
+  // 丸数字（①②③④⓪）をすべて抽出
+  const matches = scenario.match(/[①②③④⓪]/g);
+  return matches ? matches.join('') : '';
 }
 
 // POST /api/surveys - Excel data import and process
