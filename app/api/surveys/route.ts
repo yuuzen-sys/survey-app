@@ -9,8 +9,8 @@ import { v4 as uuidv4 } from 'uuid';
  */
 function extractCarrierFromScenario(scenario: string): string {
   // シナリオ列から最初の英字（1～3文字）を抽出
-  // 【D②③】、D②③、D⓪、Ⅾ⓪ など全形式に対応
-  const match = scenario.match(/([a-zA-Z]+)/);
+  // 半角・全角両方の英字に対応：【D②③】、D②③、D⓪、Ｄ⓪ など全形式に対応
+  const match = scenario.match(/([a-zA-Ａ-Ｚａ-ｚ]+)/);
   if (match) return match[1];
   return '';
 }
